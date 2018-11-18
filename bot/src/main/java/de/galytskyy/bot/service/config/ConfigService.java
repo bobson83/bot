@@ -7,4 +7,6 @@ public interface ConfigService {
     Config getConfig();
 
     void saveConfig(Config configs);
+
+    boolean IsConfigInvalid();
 }

@@ -1,8 +1,8 @@
 package de.galytskyy.bot.service.worker;
 
 import de.galytskyy.bot.entity.Config;
+import de.galytskyy.bot.entity.NotificationDto;
 import de.galytskyy.bot.service.config.ConfigService;
-import de.galytskyy.bot.service.notifier.email.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -15,23 +15,18 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.time.LocalDateTime;
-
 @Service
 public class PostmanServiceImpl implements PostmanService {
 
-    private static final String SUBJECT = "Bot notification at: ";
     private final ConfigService configService;
-    private final EmailService emailService;
 
     @Autowired
-    public PostmanServiceImpl(ConfigService configService, EmailService emailService) {
+    public PostmanServiceImpl(ConfigService configService) {
 
         this.configService = configService;
-        this.emailService = emailService;
     }
 
-    public void sendRequest() {
+    public NotificationDto sendRequest() {
 
         Config config = configService.getConfig();
         String result = "";
@@ -40,8 +35,8 @@ public class PostmanServiceImpl implements PostmanService {
         if (statusCode == HttpStatus.ACCEPTED) {
             result = responseEntity.getBody();
         }
-        String text = "Status Code: " + statusCode + " Result: " + result;
-        emailService.sendSimpleMessage(config.getEmailTo(), SUBJECT + LocalDateTime.now(), text);
+
+        return new NotificationDto(result, statusCode, config.getEmailTo());
     }
 
     //If you have problem with https: http://magicmonster.com/kb/prg/java/ssl/pkix_path_building_failed.html

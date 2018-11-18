@@ -3,11 +3,6 @@ package de.galytskyy.bot.service.config;
 import de.galytskyy.bot.entity.Config;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 @Service
 public class ConfigServiceImpl implements ConfigService {
 
@@ -15,7 +10,7 @@ public class ConfigServiceImpl implements ConfigService {
 
     public Config getConfig() {
 
-        return config != null ? config : getDefaultConfig();
+        return config;
     }
 
     public void saveConfig(Config config) {
@@ -23,15 +18,9 @@ public class ConfigServiceImpl implements ConfigService {
         this.config = config;
     }
 
-    private Config getDefaultConfig() {
+    @Override
+    public boolean IsConfigInvalid() {
 
-        List params = new ArrayList<>();
-
-        Map<String, String> map = new HashMap<>();
-        map.put("key1", "value1");
-        map.put("key2", "value2");
-        params.add(map);
-
-        return new Config("dummyUrl", params, "dummy@email");
+        return config == null || "https://your_path".equals(config.getUrl());
     }
 }
