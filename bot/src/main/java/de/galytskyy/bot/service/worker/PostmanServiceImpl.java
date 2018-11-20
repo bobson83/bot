@@ -6,7 +6,6 @@ import de.galytskyy.bot.service.config.ConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +31,7 @@ public class PostmanServiceImpl implements PostmanService {
         String result = "";
         ResponseEntity<String> responseEntity = doPost(config);
         HttpStatus statusCode = responseEntity.getStatusCode();
-        if (statusCode == HttpStatus.ACCEPTED) {
+        if (statusCode == HttpStatus.OK) {
             result = responseEntity.getBody();
         }
 
@@ -44,7 +43,7 @@ public class PostmanServiceImpl implements PostmanService {
 
         RestTemplate restTemplate = new RestTemplate();
         LinkedMultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        config.getParams().get(0).forEach(params::add);
+        config.getParams().forEach(innerMap -> innerMap.forEach(params::add));
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(config.getUrl());
 
@@ -54,9 +53,8 @@ public class PostmanServiceImpl implements PostmanService {
         HttpEntity<LinkedMultiValueMap<String, String>> requestEntity =
                 new HttpEntity<>(params, headers);
 
-        return restTemplate.exchange(
+        return restTemplate.postForEntity(
                 builder.build().encode().toUri(),
-                HttpMethod.POST,
                 requestEntity,
                 String.class);
     }
